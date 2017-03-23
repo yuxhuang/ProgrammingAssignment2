@@ -18,15 +18,9 @@ makeCacheMatrix <- function(x = matrix()) {
   setSolved <- function (s, ...) {
     params <- list(...)
     
-    if (identical(solved, list())) {
-      solved <<- list( list(params, s) )
-    }
-    else {
-      solved <<- list(solved, list(params, s))
-    }
+    ## append the new key/value pair to the solved list.
+    solved[[ length(solved)+1 ]] <<- list(params, s)
     
-    print(solved)
-
     solved
   }
   
