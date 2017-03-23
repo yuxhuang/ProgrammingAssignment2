@@ -1,15 +1,64 @@
-## Put comments here that give an overall description of what your
-## functions do
+## This set of functions implement a caching mechanism of matrix inverse.
 
-## Write a short comment describing this function
+## Create a cached version of a matrix
 
 makeCacheMatrix <- function(x = matrix()) {
+  solved <- list()
+  
+  set <- function (y) {
+    x <<- y
+    solved <<- list()
+  }
+  
+  get <- function () x
+  
+  ## solve() accepts a ... argument. We need to handle it by caching
+  ## the result with the each item in following structure:
+  ## list( list(arg1, arg2), 'result1' )
+  setSolved <- function (s, ...) {
+    params <- list(...)
+    
+    if (identical(solved, list())) {
+      solved <<- list( list(params, s) )
+    }
+    else {
+      solved <<- list(solved, list(params, s))
+    }
+    
+    print(solved)
 
+    solved
+  }
+  
+  ## Iterate within the solved list to find the cached result.
+  getSolved <- function(...) {
+    params <- list(...)
+    
+    for (item in solved) {
+      if (identical(params, item[[1]])) {
+        return(item[[2]])
+      }
+    }
+  }
+  
+  list(set = set, get = get, setSolved = setSolved, getSolved = getSolved)
 }
 
 
-## Write a short comment describing this function
+## Return the inverse of a matrix from the cache. If the cache does not exist, it
+## will compute the inverse first then cache the result.
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+  s <- x$getSolved(...)
+  
+  if (!is.null(s)) {
+    message('using cached inverse')
+    return(s)
+  }
+  
+  mat <- x$get()
+  s <- solve(mat, ...)
+  x$setSolved(s, ...)
+  s
 }
+
